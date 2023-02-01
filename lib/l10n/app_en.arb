@@ -1,0 +1,15 @@
+ {
+     "helloWorld": "Hello World!",
+     "day": "Today",
+     "button": "Add Task",
+     "screenNotes": "Screen Notes",
+     "notes": "You do not have any tasks!\nAdd New tasks to make your days productive",
+     "noteTitle": "Note title",
+     "notesDetails": "Details notes",
+     "saveTask": "Save Task",
+     "createNoteScreen": "Create Notes",
+     "editNoteScreen": "Edit Notes",
+     "@helloWorld": {
+       "description": "The conventional newborn programmer greeting"
+     }
+ }

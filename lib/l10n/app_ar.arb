@@ -1,0 +1,15 @@
+ {
+     "helloWorld": "مرحباً بك",
+     "day": "اليوم",
+     "button": "اضافة مهام",
+     "screenNotes": "المهام",
+     "notes": "ليس لديك أي مهام! أضف مهام جديدة لجعل أيامك منتجة",
+     "noteTitle": "عنوان المهمة",
+     "notesDetails": "تفاصيل المهمة",
+     "saveTask": "حفظ المهمة",
+     "createNoteScreen": "انشاء المهام",
+     "editNoteScreen": "تعديل المهام",
+     "@helloWorld": {
+       "description": "هذه الرسالة الترحيبية للتطبيق"
+     }
+ }
