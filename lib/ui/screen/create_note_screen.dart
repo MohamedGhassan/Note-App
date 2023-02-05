@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:sqflite_app/bloc/app_states.dart';
-import 'package:sqflite_app/bloc/cubit.dart';
-import 'package:sqflite_app/models/notes.dart';
-import 'package:sqflite_app/ui/widgets/button.dart';
+import '../../bloc/app_states.dart';
+import '../../bloc/cubit.dart';
+import '../../models/notes.dart';
 import '../theme.dart';
+import '../widgets/button.dart';
 import '../widgets/input_feild.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class CreateNoteScreen extends StatefulWidget {
   const CreateNoteScreen({Key? key}) : super(key: key);
@@ -15,39 +17,39 @@ class CreateNoteScreen extends StatefulWidget {
   State<CreateNoteScreen> createState() => _CreateNoteScreenState();
 }
 
-
 class _CreateNoteScreenState extends State<CreateNoteScreen> {
-
   @override
   void initState() {
     super.initState();
-    titlec.text = "hi";
-    notec.text = "my name is good";
+    titlec.text = "";
+    noatc.text = "";
     remindc.text = "5";
     repeatc.text = "None";
     etimec.text = DateFormat("hh:mm a")
         .format(DateTime.now().add(const Duration(minutes: 15)));
     stimec.text = DateFormat("hh:mm a").format(DateTime.now());
-    datec.text = DateFormat.yMd().format(DateTime.now());
+    datac.text = DateFormat.yMd().format(DateTime.now());
   }
 
   TextEditingController titlec = TextEditingController();
-  TextEditingController notec = TextEditingController();
-  TextEditingController datec = TextEditingController();
+  TextEditingController noatc = TextEditingController();
+  TextEditingController datac = TextEditingController();
   TextEditingController stimec = TextEditingController();
   TextEditingController etimec = TextEditingController();
   TextEditingController remindc = TextEditingController();
   TextEditingController repeatc = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
   DateTime date = DateTime.now();
   dynamic eTime =
   TimeOfDay.fromDateTime(DateTime.now().add(const Duration(minutes: 15)));
   dynamic sTime = TimeOfDay.now();
-  int remind = 3;
+
+  int remind = 5;
   List<int> remindList = [5, 10, 15, 20];
   String repeat = "None";
-  List<String> repeatList = ["None", "Daily", "weekly", "Monthly"];
+  List<String> rpeatList = ["None", "Daily", "weekly", "Monthly"];
   int color = 0;
 
   @override
@@ -58,15 +60,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
         AppCubit cubit = AppCubit.get(context);
         return Scaffold(
           backgroundColor:
-          !cubit.model ? Theme
-              .of(context)
-              .backgroundColor : Colors.white,
+          !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
           appBar: AppBar(
-            elevation: 0.0,
+            elevation: 0,
             backgroundColor:
-            !cubit.model ? Theme
-                .of(context)
-                .backgroundColor : Colors.white,
+            !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
             leading: IconButton(
               color: cubit.model ? darkHeaderClr : Colors.white,
               icon: const Icon(
@@ -77,14 +75,16 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                 Navigator.pop(context);
               },
             ),
-            actions: const[
+            actions: const [
               Padding(
                 padding: EdgeInsets.all(10.0),
                 child: CircleAvatar(
                   radius: 18,
-                  backgroundImage: AssetImage("assets/images/person.jpg"),
+                  backgroundImage: AssetImage(
+                    "assets/images/person.jpg",
+                  ),
                 ),
-              )
+              ),
             ],
           ),
           body: Container(
@@ -97,26 +97,26 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                   children: [
                     Center(
                         child: Text(
-                          "Add Task",
+                          "${AppLocalizations.of(context)!.createNoteScreen}",
                           style: Themes.supHeadingStyle,
                         )),
-                    ...?mainForm(
-                      title: "Title",
-                      myController: titlec,
+                    ...mainForm(
+                      title: "${AppLocalizations.of(context)!.noteTitle}",
+                      mycontrolar: titlec,
                       readOnly: false,
                       icon: Icons.title,
                       textInputType: TextInputType.text,
                     ),
-                    ...?mainForm(
-                      title: "Noat",
-                      myController: notec,
+                    ...mainForm(
+                      title: "${AppLocalizations.of(context)!.notesDetails}",
+                      mycontrolar: noatc,
                       readOnly: false,
                       icon: Icons.note,
                       textInputType: TextInputType.text,
                     ),
-                    ...?mainForm(
-                        title: "Date",
-                        myController: datec,
+                    ...mainForm(
+                        title: "${AppLocalizations.of(context)!.date}",
+                        mycontrolar: datac,
                         readOnly: true,
                         icon: Icons.data_usage_outlined,
                         textInputType: TextInputType.text,
@@ -132,7 +132,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             if (value != null) {
                               setState(() {
                                 date = value;
-                                datec.text = DateFormat.yMd().format(value);
+                                datac.text = DateFormat.yMd().format(value);
                               });
                             }
                           });
@@ -143,9 +143,9 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ...?mainForm(
-                                    title: "Start Time",
-                                    myController: stimec,
+                                ...mainForm(
+                                    title: "${AppLocalizations.of(context)!.startTime}",
+                                    mycontrolar: stimec,
                                     readOnly: true,
                                     icon: Icons.watch,
                                     textInputType: TextInputType.number,
@@ -159,8 +159,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                                           setState(() {
                                             sTime = value.format(context);
                                             stimec.text =
-                                                value.format(context)
-                                                    .toString();
+                                                value.format(context).toString();
                                           });
                                         }
                                       });
@@ -174,9 +173,9 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                ...?mainForm(
-                                    title: "End Time",
-                                    myController: etimec,
+                                ...mainForm(
+                                    title: "${AppLocalizations.of(context)!.endTime}",
+                                    mycontrolar: etimec,
                                     readOnly: true,
                                     icon: Icons.watch,
                                     textInputType: TextInputType.number,
@@ -199,9 +198,9 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             ))
                       ],
                     ),
-                    ...?mainForm(
-                      title: "Remind",
-                      myController: remindc,
+                    ...mainForm(
+                      title: "${AppLocalizations.of(context)!.remind}",
+                      mycontrolar: remindc,
                       readOnly: true,
                       icon: Icons.arrow_drop_down,
                       textInputType: TextInputType.number,
@@ -226,9 +225,9 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             });
                       }),
                     ),
-                    ...?mainForm(
-                      title: "Repeat",
-                      myController: repeatc,
+                    ...mainForm(
+                      title: "${AppLocalizations.of(context)!.repeat}",
+                      mycontrolar: repeatc,
                       readOnly: true,
                       hintText: repeat,
                       icon: Icons.arrow_drop_down,
@@ -238,7 +237,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                             borderRadius: BorderRadius.circular(10),
                             dropdownColor: Colors.blueGrey,
                             underline: Container(),
-                            items: repeatList.map((String item) {
+                            items: rpeatList.map((String item) {
                               return DropdownMenuItem(
                                 child: Text(item),
                                 value: item,
@@ -263,7 +262,7 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Color",
+                              "${AppLocalizations.of(context)!.color}",
                               style: Themes.titleStyle,
                             ),
                             const SizedBox(
@@ -288,10 +287,10 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                         DefaultButton(
                             onPress: () async {
                               if (_formKey.currentState!.validate()) {
-                                await addNote(context);
+                                await addTask(context);
                               }
                             },
-                            label: "Submit")
+                            label: "${AppLocalizations.of(context)!.saveTask}")
                       ],
                     )
                   ],
@@ -312,51 +311,54 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
       endTime: etimec.text,
       startTime: stimec.text,
       isCompleted: 0,
-      note: notec.text,
+      note: noatc.text,
       title: titlec.text,
       remind: remind,
       repeat: repeat,
     );
-    int? id = await cubit.addNote(n);
+    int id = await cubit.addNote(n);
     n.setId(id);
     print("id is " + n.id.toString());
     cubit.saveAnddisplayNotification(n);
     Navigator.pop(context);
   }
 
-  List<Widget>? mainForm({required String title,
-    required myController,
-    required readOnly,
+  List<Widget> mainForm({
+    required String title,
+    required mycontrolar,
+    required bool readOnly,
     required IconData icon,
     required textInputType,
     Function? onPressSuffixIcon,
     dynamic foucs,
     String? hintText,
-    Widget? widget}) {
+    Widget? widget,
+  }) {
     return [
       const SizedBox(
-        height: 15.0,
+        height: 15,
       ),
-      Text(title, style: Themes.titleStyle,),
+      Text(
+        title,
+        style: Themes.titleStyle,
+      ),
       const SizedBox(
-        height: 10.0,
+        height: 10,
       ),
       DefaultTextFormField(
         widget: widget,
         readOnly: readOnly,
-        hintText: hintText ?? "Enter $title",
-        labelText: title,
+        hintText: hintText ?? "$title",
+        // labelText: title,
         isPassword: false,
         textInputType: textInputType,
-        controller: myController,
+        controller: mycontrolar,
         suffixIcon: icon,
         onPressSuffixIcon: () {
           if (onPressSuffixIcon != null) onPressSuffixIcon();
         },
         validator: (String? value) {
-          if (value == null || value
-              .trim()
-              .isEmpty) {
+          if (value == null || value.trim().isEmpty) {
             return 'Please fill the field';
           }
           return null;
@@ -365,158 +367,19 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
     ];
   }
 
-  Widget colorAvatar(Color myColor, int index) {
+  Widget colorAvatar(Color mycolor, int indix) {
     return InkWell(
       onTap: () {
         setState(() {
-          color = index;
-          print("Color : " + color.toString());
+          color = indix;
+          print("color : " + color.toString());
         });
       },
       child: CircleAvatar(
+        backgroundColor: mycolor,
         radius: 15,
-        backgroundColor: myColor,
-        child: index == color ? Icon(Icons.done) : null,
+        child: indix == color ? const Icon(Icons.done) : null,
       ),
     );
   }
-
-  addNote(context) async {
-    AppCubit cubit = AppCubit.get(context);
-    Note n = Note(
-        color: color,
-        date: DateFormat.yMd().format(date),
-        endTime: etimec.text,
-        startTime: stimec.text,
-        isCompleted: 0,
-        note: notec.text,
-        title: titlec.text,
-        remind: remind,
-        repeat: repeat);
-    int id = await cubit.addNote(n);
-    n.setId(id);
-    print("id is " + id.toString());
-    // cubit.saveAnddisplayNotification(n);
-    Navigator.pop(context);
-  }
 }
-
-
-// import 'package:flutter/material.dart';
-// import 'package:sqflite_app/database/database.dart';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-//
-// import '../../models/notes.dart';
-//
-//
-// class CreateNoteScreen extends StatefulWidget {
-//   final String? title;
-//
-//   CreateNoteScreen({this.title});
-//
-//   @override
-//   State<CreateNoteScreen> createState() => _CreateNoteScreenState();
-// }
-//
-// class _CreateNoteScreenState extends State<CreateNoteScreen> {
-//   TextEditingController? _titleEditingController;
-//   TextEditingController? _detailsEditingController;
-//
-//   @override
-//   void initState() {
-//     // TODO: implement initState
-//     super.initState();
-//     _titleEditingController = TextEditingController();
-//     _detailsEditingController = TextEditingController();
-//
-//   }
-//
-//   @override
-//   void dispose() {
-//     // TODO: implement dispose
-//     super.dispose();
-//     _titleEditingController!.dispose();
-//     _detailsEditingController!.dispose();
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(AppLocalizations.of(context)!.createNoteScreen),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(15.0),
-//         child: Column(
-//           children: [
-//             TextField(
-//               controller: _titleEditingController,
-//               keyboardType: TextInputType.text,
-//               decoration: InputDecoration(
-//                 hintText: AppLocalizations.of(context)!.noteTitle,
-//               ),
-//             ),
-//             SizedBox(
-//               height: 20,
-//             ),
-//             TextField(
-//               controller: _detailsEditingController,
-//               keyboardType: TextInputType.text,
-//               decoration: InputDecoration(
-//                 hintText: AppLocalizations.of(context)!.notesDetails,
-//               ),
-//             ),
-//             SizedBox(
-//               height: 20,
-//             ),
-//             SizedBox(
-//                 width: double.infinity,
-//                 height: 50,
-//                 child: ElevatedButton.icon(
-//                   onPressed: () async{
-//                     await performStore();
-//                   },
-//                   icon: Icon(Icons.save_alt),
-//                   label: Text(AppLocalizations.of(context)!.saveTask),
-//                 ))
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Future performStore() async {
-//     if (checkData()) {
-//       await create();
-//     }
-//   }
-//
-//   bool checkData() {
-//     if (_titleEditingController!.text.isNotEmpty &&
-//         _detailsEditingController!.text.isNotEmpty) {
-//       return true;
-//     }
-//     return false;
-//   }
-//
-//   // Future create() async {
-//   //  bool inserted =  await DataBase.instance!.create(getNote());
-//   //  if(inserted)
-//   //    {
-//   //      print("Inserted Successfully");
-//   //      clear();
-//   //    }
-//   // }
-//
-//   Note getNote() {
-//     return Note(
-//       title: _titleEditingController!.text,
-//       details: _detailsEditingController!.text,
-//     );
-//   }
-//
-//   void clear(){
-//     _titleEditingController!.text = "";
-//     _detailsEditingController!.text = "";
-//   }
-// }

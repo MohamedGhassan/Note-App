@@ -1,14 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:sqflite_app/bloc/cubit.dart';
-import 'package:sqflite_app/ui/size_config.dart';
-import '../../models/notes.dart';
-import '../theme.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+//import 'package:get/get.dart';
+
+//import '../../controllers/task_controller.dart';
+//import '../../services/notification_services.dart';
+import '../../bloc/cubit.dart';
+import '../../models/notes.dart';
+import '../size_config.dart';
+import '../theme.dart';
+
+Widget noTasks(BuildContext context) {
+  AppCubit cubit = AppCubit.get(context);
+  return Stack(
+    children: [
+      AnimatedPositioned(
+        duration: const Duration(hours: 2),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            cubit.getNote();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Wrap(
+              direction: SizeConfig.orientation == Orientation.landscape
+                  ? Axis.horizontal
+                  : Axis.vertical,
+              //main
+              alignment: WrapAlignment.center,
+              //cross
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                SizeConfig.orientation == Orientation.landscape
+                    ? const SizedBox(
+                  height: 6,
+                )
+                    : const SizedBox(
+                  height: 120,
+                ),
+                SvgPicture.asset(
+                  "assets/images/task.svg",
+                  color: primaryClr.withOpacity(0.7),
+                  height: 100,
+                  semanticsLabel: "Task",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "You do not have any tasks!\nAdd New tasks to make your days productive",
+                  style: Themes.supTitleStyle,
+                  textAlign: TextAlign.center,
+                ),
+                SizeConfig.orientation == Orientation.landscape
+                    ? const SizedBox(
+                  height: 120,
+                )
+                    : const SizedBox(
+                  height: 150,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+//final TaskController controller = Get.put(TaskController());
 showMyBottomSheet(BuildContext context, Note note) {
   AppCubit cubit = AppCubit.get(context);
-  // NotifyHelper notifyHelper=NotifyHelper();
+  //NotifyHelper notifyHelper=NotifyHelper();
 
   showBottomSheet(
     context: context,
@@ -53,7 +116,7 @@ showMyBottomSheet(BuildContext context, Note note) {
             Divider(
               color: !cubit.model ? Colors.grey : darkGreyClr,
             ),
-            bottomSheetButton(context, label: "Cancel", isClosed: false,
+            bottomSheetButton(context, label: "Cancel", isClosed: true,
                 ontap: () {
                   Navigator.pop(context);
                 }, clr: primaryClr),
@@ -61,74 +124,6 @@ showMyBottomSheet(BuildContext context, Note note) {
         ),
       ),
     ),
-  );
-}
-
-Widget noTasks(BuildContext context) {
-  AppCubit cubit = AppCubit.get(context);
-  return Stack(
-    children: [
-      AnimatedPositioned(
-        duration: const Duration(seconds: 2),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            cubit.getNote();
-          },
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Wrap(
-              direction: SizeConfig.orientation == Orientation.landscape
-                  ? Axis.horizontal
-                  : Axis.vertical,
-              //main
-              alignment: WrapAlignment.center,
-              //cross
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                SizeConfig.orientation == Orientation.landscape
-                    ? const SizedBox(
-                  height: 6,
-                )
-                    : const SizedBox(
-                  height: 120,
-                ),
-                SvgPicture.asset(
-                  "assets/images/task.svg",
-                  color: primaryClr.withOpacity(0.7),
-                  height: 100,
-                  semanticsLabel: "Task",
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  AppLocalizations.of(context)!.notes,
-                  // style: Themes.supTitleStyle,
-                  style: TextStyle(
-                    fontSize: 18,
-                    // fontWeight: FontWeight.w300,
-                    color: !cubit.model ? Colors.white : Colors.grey[700],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                // Text(
-                //   "You do not have any tasks!\nAdd New tasks to make your days productive",
-                //   style: Themes.supTitleStyle,
-                //   textAlign: TextAlign.center,
-                // ),
-                SizeConfig.orientation == Orientation.landscape
-                    ? const SizedBox(
-                  height: 120,
-                )
-                    : const SizedBox(
-                  height: 150,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ],
   );
 }
 
@@ -164,42 +159,3 @@ Widget bottomSheetButton(BuildContext context,
     ),
   );
 }
-
-// List<Widget>? mainForm({required String title,
-//   required myController,
-//   required readOnly,
-//   required IconData icon,
-//   required textInputType,
-//   Function? onPressSuffixIcon,
-//   dynamic foucs,
-//   String? hintText,
-//   Widget? widget}) {
-//   return [
-//     const SizedBox(
-//       height: 15.0,
-//     ),
-//     Text(title, style: Themes.titleStyle,),
-//     const SizedBox(
-//       height: 10.0,
-//     ),
-//     DefaultTextFormField(
-//       widget: widget,
-//       readOnly: readOnly,
-//       hintText: hintText ?? "Enter $title",
-//       labelText: title,
-//       isPassword: false,
-//       textInputType: textInputType,
-//       controller: myController,
-//       suffixIcon: icon,
-//       onPressSuffixIcon: () {
-//         if (onPressSuffixIcon != null) onPressSuffixIcon();
-//       },
-//       validator: (String? value) {
-//         if (value == null || value.trim().isEmpty) {
-//           return 'Please fill the field';
-//         }
-//         return null;
-//       },
-//     ),
-//   ];
-// }

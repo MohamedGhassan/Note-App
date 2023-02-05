@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'package:google_fonts/google_fonts.dart';
+
+//import '../controllers/bloc/app_cubit.dart';
 
 const Color bluishClr = Color(0xFF4e5ae8);
 const Color orangeClr = Color(0xCFFF8746);
@@ -8,8 +11,10 @@ const Color white = Colors.white;
 const primaryClr = bluishClr;
 const Color darkGreyClr = Color(0xFF121212);
 const Color darkHeaderClr = Color(0xFF424242);
+const Color darkBlue = Color(0xFF192882);
 
-class Themes {
+
+ class Themes {
 
 
   static final light = ThemeData(

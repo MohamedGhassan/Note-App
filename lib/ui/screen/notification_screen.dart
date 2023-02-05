@@ -16,11 +16,11 @@ class NotificationScreen extends StatelessWidget {
         AppCubit cubit = AppCubit.get(context);
         return Scaffold(
           backgroundColor: //darkHeaderClr,
-          !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
+              !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
           appBar: AppBar(
             elevation: 0,
             backgroundColor:
-            !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
+                !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
             centerTitle: true,
             title: Text(
               payload.split("|")[0],
@@ -48,9 +48,9 @@ class NotificationScreen extends StatelessWidget {
                     height: 15,
                   ),
                   Text("you have a new Task and it is ${payload.split("|")[0]}",
-                    style: Themes.titleStyle,
-                    textAlign: TextAlign.center,
-                  ),
+                      style: Themes.titleStyle,
+                       textAlign: TextAlign.center,
+                    ),
                   const SizedBox(
                     height: 10,
                   ),

@@ -41,6 +41,8 @@ dependencies:
   sqflite: ^2.2.2
   path: ^1.8.2
   get: ^4.6.5
+  flutter_local_notifications: ^9.6.1
+
   flutter_native_timezone: ^2.0.0
   path_provider: ^2.0.11
   shared_preferences: ^2.0.15
@@ -52,16 +54,18 @@ dependencies:
   rxdart: ^0.27.4
   hexcolor:
   flutter_staggered_animations: ^1.0.0
-  flutter_local_notifications: ^9.6.1
   device_preview: ^1.1.0
   lottie: ^2.2.0
   day_night_switcher: ^0.2.0+1
   sizer: ^2.0.15
+  conditional_builder_null_safety:
+  fluttertoast: ^8.1.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.11.0
+  flutter_lints: ^1.0.0
 
 flutter_icons:
   android: true

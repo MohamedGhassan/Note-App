@@ -22,49 +22,52 @@ class TaskTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(16),
             color: getColor(note.color)),
         child: Row(
           children: [
             Expanded(
-                child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    note.title!,
-                    style: Themes.body2Style
-                        .copyWith(fontSize: 16, color: Colors.grey[100]),
-                  ),
-                  SizedBox(
-                    height: 12.0,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.access_time_filled_outlined,
-                        color: Colors.grey[200],
-                        size: 18,
-                      ),
-                      SizedBox(
-                        width: 12.0,
-                      ),
-                      Text(
-                        note.startTime! + " - " + note.endTime!,
-                        style: Themes.body2Style.copyWith(fontSize: 13, color: Colors.grey[100],),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 12.0,
-                  ),
-                  Text(note.note!,
-                    style: Themes.body2Style
-                      .copyWith(fontSize: 14, color: Colors.grey[100]),)
-                ],
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      note.title!,
+                      style: Themes.body2Style
+                          .copyWith(fontSize: 16, color: Colors.grey[100]),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.access_time_filled_rounded,
+                          color: Colors.grey[200],
+                          size: 18,
+                        ),
+                        const SizedBox(
+                          width: 12,
+                        ),
+                        Text(
+                          note.startTime! + " - " + note.endTime!,
+                          style: Themes.body2Style
+                              .copyWith(fontSize: 13, color: Colors.grey[100]),
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+                    Text(
+                      note.note!,
+                      style: Themes.body2Style
+                          .copyWith(fontSize: 14, color: Colors.grey[100]),
+                    ),
+                  ],
+                ),
               ),
-            ),
             ),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 10),

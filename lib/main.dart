@@ -7,8 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_app/bloc/cubit.dart';
 import 'package:sqflite_app/bloc/observer.dart';
 import 'package:sqflite_app/database/shared_preferences_controller.dart';
-import 'package:sqflite_app/ui/screen/splach_screen.dart';
+import 'package:sqflite_app/ui/screen/notes_screen.dart';
 import 'package:sqflite_app/ui/theme.dart';
+
 import 'bloc/app_states.dart';
 
 void main() async {
@@ -34,7 +35,6 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
 
   late Locale _locale;
-  bool isDarkMoodEnable = false;
   void changeLocale(Locale locale){
     setState(() {
       _locale = locale;
@@ -44,7 +44,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(Intl.defaultLocale == null) Intl.defaultLocale = "en";
+    Intl.defaultLocale ??= "en";
     _locale = Locale(Intl.defaultLocale!);
     print("_locale ${Intl.defaultLocale}");
 
@@ -52,15 +52,15 @@ class _MainAppState extends State<MainApp> {
     {
       String locale = value.getString('locale')!;
       if(locale == null)
-        {
-          value.setString('locale', "en");
-        }
+      {
+        value.setString('locale', "en");
+      }
       Intl.defaultLocale = locale ?? "en";
       _locale = Locale(locale ?? "en");
       print("Locale: $locale");
     });
   }
-  @override
+  // @override
 
   Widget build(BuildContext context) {
     return  BlocProvider(
@@ -86,7 +86,7 @@ class _MainAppState extends State<MainApp> {
               const Locale('ar', ''), // Arabic, no country code
             ],
             locale: _locale,
-            home: const SplachScreen(),
+            home: const NotesScreen(),
           );
         },
       ),

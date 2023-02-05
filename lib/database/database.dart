@@ -1,17 +1,15 @@
 import 'dart:core';
-import 'dart:io';
 
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../models/notes.dart';
 
- late Database database;
+ Database? database;
 List<Map> tasks = [];
 
 class DataBase {
   static const tableName = 'notes';
+
   static Future _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
   }
@@ -25,15 +23,15 @@ class DataBase {
   //   return _instance;
   // }
 
-   initDB() async {
+  initDB() async {
     await openDatabase(
-        "note.db",
-        version: 1,
-        onConfigure: _onConfigure,
-        onCreate: (db, version) async {
-          print("Database is Created");
-          try{
-            await db.execute("""
+      "note.db",
+      version: 1,
+      onConfigure: _onConfigure,
+      onCreate: (db, version) async {
+        print("Database is Created");
+        try {
+          await db.execute("""
             create table $tableName(
              id  INTEGER PRIMARY KEY AUTOINCREMENT,
              title STRING,note TEXT,date STRING,
@@ -42,14 +40,12 @@ class DataBase {
              color int,isCompleted int
             );
             """);
-          }catch(e)
-          {
-            print("error is " + e.toString());
-          }
-          },
-      onOpen: (db){},
-    ).then((value)
-    {
+        } catch (e) {
+          print("error is " + e.toString());
+        }
+      },
+      onOpen: (db) {},
+    ).then((value) {
       database = value;
       print("database is open");
     });
@@ -63,38 +59,38 @@ class DataBase {
   //   return insertedId != 0 ? true : false;
   // }
 
-  Future<int> insertPersonDataToDB(Note t) async {
-    return await database.insert(tableName, t.toMap());
+   Future<int> insertPersonDataToDB(Note note) async {
+    return await database!.insert(tableName, note.toMap());
   }
 
   Future<List<Map>> getTableDataFromDb() async {
     print("table is $tableName");
     String sql = "select * from $tableName";
-    return await database.rawQuery(sql);
+    return await database!.rawQuery(sql);
   }
 
-  Future<List<Map>> getItemDataFromDB(int  id) async{
+  Future<List<Map>> getItemDataFromDB(int id) async {
     print("table is $tableName");
     String sql = "select from ${tableName} where id=$id";
-    return await database.rawQuery(sql);
+    return await database!.rawQuery(sql);
   }
 
   // @override
   Future<void> update(Note t) async {
-    await database.rawUpdate(
-        "UPDATE $tableName set isCompleted= 1 WHERE id = ${t.id}");
+    await database
+    !.rawUpdate("UPDATE $tableName set isCompleted= 1 WHERE id = ${t.id}");
   }
 
   void deleteAll() async {
-    await database.delete(tableName);
+    await database!.delete(tableName);
   }
 
-  @override
+  // @override
   void deleteItemFromDB(
-      int id,
-      ) async {
-    await database.transaction((txn) async {
-      database.rawDelete('DELETE FROM $tableName WHERE id = $id').then((value) {
+    int id,
+  ) async {
+    await database!.transaction((txn) async {
+      database!.rawDelete('DELETE FROM $tableName WHERE id = $id').then((value) {
         print("item $id in table $tableName deleted successfully");
       }).catchError((error) {
         print("deleting item $id in table $tableName error: $error");
@@ -102,7 +98,7 @@ class DataBase {
     });
   }
 
-  // DateTime selectedData = DateTime.now();
+// DateTime selectedData = DateTime.now();
 }
 
 // import 'dart:core';

@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-
 import '../models/notes.dart';
 import '../ui/screen/notification_screen.dart';
 
 class NotifyHelper {
   late BuildContext context;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   String selectedNotificationPayload = '';
 
   final BehaviorSubject<String> selectNotificationSubject =
-  BehaviorSubject<String>();
+      BehaviorSubject<String>();
+
   initializeNotification(BuildContext context) async {
-    this.context=context;
+    this.context = context;
     tz.initializeTimeZones();
     _configureSelectNotificationSubject();
     await _configureLocalTimeZone();
     // await requestIOSPermissions(flutterLocalNotificationsPlugin);
     final IOSInitializationSettings initializationSettingsIOS =
-    IOSInitializationSettings(
+        IOSInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
@@ -34,10 +33,10 @@ class NotifyHelper {
     );
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('appicon');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final InitializationSettings initializationSettings =
-    InitializationSettings(
+        InitializationSettings(
       iOS: initializationSettingsIOS,
       android: initializationSettingsAndroid,
     );
@@ -52,11 +51,14 @@ class NotifyHelper {
     );
   }
 
-  displayNotification({required String title, required String body,required startTime}) async {
+  displayNotification(
+      {required String title, required String body, required startTime}) async {
     print('doing test');
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-        'your channel id', 'your channel name',channelDescription: 'your channel description',
-        importance: Importance.max, priority: Priority.high);
+        'your channel id', 'your channel name',
+        channelDescription: 'your channel description',
+        importance: Importance.max,
+        priority: Priority.high);
     var iOSPlatformChannelSpecifics = const IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
@@ -69,78 +71,87 @@ class NotifyHelper {
       payload: '$title|$body|$startTime',
     );
   }
-  cancelNotification(Note t)async{
-    await flutterLocalNotificationsPlugin.cancel(t.id!);
-    print("task ${t.id} canceld");
+
+  cancelNotification(Note n) async {
+    await flutterLocalNotificationsPlugin.cancel(n.id!);
+    print("task ${n.id} canceld");
   }
-  cancelAllNotification()async{
+
+  cancelAllNotification() async {
     await flutterLocalNotificationsPlugin.cancelAll();
     print("all task  canceld");
   }
 
-  scheduledNotification(int hour, int minutes, Note task) async {
-    print('payload is ${task.title}|${task.note}|${task.startTime}');
+  scheduledNotification(int hour, int minutes, Note note) async {
+    print('payload is ${note.title}|${note.note}|${note.startTime}');
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      task.id!,
-      task.title,
-      task.note,
+      note.id!,
+      note.title,
+      note.note,
       //tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-      _nextInstanceOfTenAM(hour, minutes,task.remind! ,task.repeat!,task.date!),
+      _nextInstanceOfTenAM(
+          hour, minutes, note.remind!, note.repeat!, note.date!),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-            'your channel id', 'your channel name',channelDescription: 'your channel description'),
+          'your channel id',
+          'your channel name',
+          channelDescription: 'your channel description',
+          icon: '@mipmap/ic_launcher',
+          importance: Importance.max,
+          priority: Priority.max,
+        ),
       ),
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
+          UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
-      payload: '${task.title}|${task.note}|${task.startTime}|',
+      payload: '${note.title}|${note.note}|${note.startTime}|',
     );
-
   }
 
-  tz.TZDateTime _nextInstanceOfTenAM(int hour, int minutes, int remind, String repeat, String date) {
+  tz.TZDateTime _nextInstanceOfTenAM(
+      int hour, int minutes, int remind, String repeat, String date) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     print("now = $now");
-    var fd=DateFormat.yMd().parse(date);
+    var fd = DateFormat.yMd().parse(date);
     final tz.TZDateTime nfd = tz.TZDateTime.from(fd, tz.local);
     tz.TZDateTime scheduledDate =
-    tz.TZDateTime(tz.local, nfd.year, nfd.month, nfd.day, hour, minutes);
+        tz.TZDateTime(tz.local, nfd.year, nfd.month, nfd.day, hour, minutes);
     print("scheduledDate = $scheduledDate");
 
     scheduledDate = afterRemind(remind, scheduledDate);
 
-
     if (scheduledDate.isBefore(now)) {
-
-      if(repeat=="Daily"){
-        scheduledDate =  tz.TZDateTime(tz.local, now.year, now.month,fd.day+1 , hour, minutes);
+      if (repeat == "Daily") {
+        scheduledDate = tz.TZDateTime(
+            tz.local, now.year, now.month, fd.day + 1, hour, minutes);
       }
-      if(repeat=="weekly"){
-        scheduledDate =  tz.TZDateTime(tz.local, now.year, now.month,fd.day+7 , hour, minutes);
+      if (repeat == "weekly") {
+        scheduledDate = tz.TZDateTime(
+            tz.local, now.year, now.month, fd.day + 7, hour, minutes);
       }
-      if(repeat=="Monthly"){
-        scheduledDate =  tz.TZDateTime(tz.local, now.year,( now.month)+1,fd.day , hour, minutes);
+      if (repeat == "Monthly") {
+        scheduledDate = tz.TZDateTime(
+            tz.local, now.year, (now.month) + 1, fd.day, hour, minutes);
       }
       scheduledDate = afterRemind(remind, scheduledDate);
     }
-
 
     print("next scheduledDate = $scheduledDate");
     return scheduledDate;
   }
 
   tz.TZDateTime afterRemind(int remind, tz.TZDateTime scheduledDate) {
-    if(remind==5){
+    if (remind == 5) {
       scheduledDate = scheduledDate.add(const Duration(minutes: 5));
     }
-    if(remind==10){
+    if (remind == 10) {
       scheduledDate = scheduledDate.add(const Duration(minutes: 10));
     }
-    if(remind==15){
+    if (remind == 15) {
       scheduledDate = scheduledDate.add(const Duration(minutes: 15));
     }
-    if(remind==20){
+    if (remind == 20) {
       scheduledDate = scheduledDate.add(const Duration(minutes: 20));
     }
     return scheduledDate;
@@ -149,12 +160,12 @@ class NotifyHelper {
   void requestIOSPermissions() {
     flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>()
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+          alert: true,
+          badge: true,
+          sound: true,
+        );
   }
 
   Future<void> _configureLocalTimeZone() async {
@@ -177,18 +188,23 @@ class NotifyHelper {
 //Older IOS
   Future onDidReceiveLocalNotification(
       int id, String? title, String? body, String? payload) async {
-
-    showDialog(context: context, builder: (context)=>Dialog(backgroundColor: Colors.red,child:Text(body!) ,));
+    showDialog(
+        context: context,
+        builder: (context) => Dialog(
+              backgroundColor: Colors.red,
+              child: Text(body!),
+            ));
     //Get.dialog( Text(body!));
   }
 
   void _configureSelectNotificationSubject() {
     selectNotificationSubject.stream.listen((String payload) async {
       debugPrint('My payload is ' + payload);
-      await Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationScreen(payload:payload)));
+      await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => NotificationScreen(payload: payload)));
       //Get.to(() => NotificationScreen(payload:payload));
-
     });
   }
 }
-

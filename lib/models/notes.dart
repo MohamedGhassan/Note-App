@@ -36,6 +36,20 @@ class Note {
     endTime = task["endTime"].toString();
     startTime = task["startTime"].toString();
   }
+  Map<String, dynamic> toJson(){
+    final Map<String , dynamic> data = new Map<String, dynamic>();
+    data["id"] = this.id;
+    data["color"] = this.color;
+    data["remind"] = this.remind;
+    data["isCompleted"] = this.isCompleted;
+    data["repeat"] = this.repeat;
+    data["title"] = this.title;
+    data["note"] = this.id;
+    data["date"] = this.date;
+    data["endTime"] = this.endTime;
+    data["startTime"] = this.startTime;
+    return data;
+  }
   Map<String, Object> toMap() {
     return {
       "color": color!,

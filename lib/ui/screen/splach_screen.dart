@@ -1,7 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:sqflite_app/bloc/cubit.dart';
 import 'package:sqflite_app/ui/screen/notes_screen.dart';
+
+import '../theme.dart';
 
 class SplachScreen extends StatefulWidget {
   const SplachScreen({Key? key}) : super(key: key);
@@ -16,12 +18,18 @@ class _SplachScreenState extends State<SplachScreen>
 
   @override
   void initState() {
+    AppCubit cubit = AppCubit.get(context);
     // TODO: implement initState
     super.initState();
     _controller = AnimationController(vsync: this);
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 2), () async{
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => NotesScreen()));
+      await cubit.getNote();
+      //     .then((value)
+      // {
+      //   cubit.getNote();
+      // });
     });
   }
 
@@ -34,20 +42,26 @@ class _SplachScreenState extends State<SplachScreen>
 
   @override
   Widget build(BuildContext context) {
+    AppCubit cubit=AppCubit.get(context);
     return Scaffold(
-        body: Column(
-          // crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Lottie.network(
-            "https://assets2.lottiefiles.com/private_files/lf30_qLBJdY.json",
-            controller: _controller, onLoaded: (compos) {
-          _controller
-            ..duration = compos.duration
-            ..forward();
-        }),
-        // Text("To Do List",)
-      ],
-    ));
+        backgroundColor: !cubit.model
+            ? Theme
+            .of(context)
+            .backgroundColor
+            : Colors.white,
+        body: Container(
+            child: Center(
+              child: Lottie.network(
+                  "https://assets2.lottiefiles.com/private_files/lf30_qLBJdY.json",
+                  controller: _controller, onLoaded: (compos) {
+                Text("Errrrrrrrrrror1");
+                _controller
+                  ..duration = compos.duration
+                  ..forward();
+                Text("Errrrrrrrrrror2");
+              }),
+            )
+        )
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite_app/database/database.dart';
 import 'package:sqflite_app/database/shared_preferences_controller.dart';
@@ -13,7 +14,6 @@ class AppCubit extends Cubit<AppStates> {
 
   static AppCubit get(context) => BlocProvider.of(context);
 
-  bool isDarkMoodEnable = false;
   bool model = (SharedPreferencesController.getData(key: "mood") == null)
       ? true
       : SharedPreferencesController.getData(key: "mood");
@@ -26,7 +26,7 @@ class AppCubit extends Cubit<AppStates> {
   //   });
   //   print('l mood is $model');
   // }
-  void changMood( value) {
+  void changMood(value) {
     model = value;
     SharedPreferencesController.setData(key: "mood", value: model).then((
         value) {
@@ -46,14 +46,12 @@ class AppCubit extends Cubit<AppStates> {
   }
 
   DataBase db = DataBase();
-
   createDataBase() async {
     await db.initDB();
     emit(ScCreateDB());
   }
 
   NotifyHelper notifyHelper = NotifyHelper();
-
   initializeNotification(BuildContext context) async {
     await notifyHelper.initializeNotification(context);
     notifyHelper.requestIOSPermissions();
@@ -101,20 +99,15 @@ class AppCubit extends Cubit<AppStates> {
     noteList = [];
     emit(ScRemoveAllTask());
   }
-  bool showNote(Note task) {
-    return (task.repeat == "Daily" ||
-        DateFormat.yMd().format(selectedData) == task.date ||
-        (task.repeat == "weekly" &&
-            selectedData
-                .difference(DateFormat.yMd().parse(task.date!))
-                .inDays %
+  bool showNote(Note note) {
+    return (note.repeat == "Daily" ||
+        DateFormat.yMd().format(selectedData) == note.date ||
+        (note.repeat == "weekly" &&
+            selectedData.difference(DateFormat.yMd().parse(note.date!)).inDays %
                 7 ==
                 0) ||
-        (task.repeat == "Monthly" &&
-            DateFormat
-                .yMd()
-                .parse(task.date!)
-                .day == selectedData.day));
+        (note.repeat == "Monthly" &&
+            DateFormat.yMd().parse(note.date!).day == selectedData.day));
   }
 
   saveAnddisplayNotification(Note t) {

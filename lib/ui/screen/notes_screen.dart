@@ -3,8 +3,8 @@ import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:sizer/sizer.dart';
 import 'package:sqflite_app/bloc/app_states.dart';
 import 'package:sqflite_app/ui/screen/create_note_screen.dart';
 import '../../bloc/cubit.dart';
@@ -16,6 +16,8 @@ import '../theme.dart';
 import '../widgets/button.dart';
 import '../widgets/home_widget.dart';
 import '../widgets/task_tile.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class NotesScreen extends StatelessWidget {
   const NotesScreen({Key? key}) : super(key: key);
@@ -27,218 +29,229 @@ class NotesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     AppCubit cubit = AppCubit.get(context);
-    return BlocProvider(
-      create: (context) => AppCubit(),
-      child: BlocConsumer<AppCubit, AppStates>(
-        listener: (context, state) {
-          if (state is ScCreateDB) {
-            cubit.initializeNotification(context);
-            cubit.getNote();
-          }
+    return BlocConsumer<AppCubit, AppStates>(
+      listener: (context, state) {
+        if (state is ScCreateDB) {
+          cubit.initializeNotification(context);
+          cubit.getNote();
+        }
+      },
+      builder: (context, state) {
+        AppCubit cubit = AppCubit.get(context);
+        return Scaffold(
+          // color: !cubit.model ? Colors.white : Colors.black,
+          /// علامة التعجب بحطها عشان اعكس الشرط تاع المودل
+            backgroundColor: !cubit.model
+                ? Theme
+                .of(context)
+                .backgroundColor
+                : Colors.white,
+            appBar: appBar(context),
+            body: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                children: [
+                  addTaskBar(context),
+                  addDateBar(context),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  showNote(context),
+                ],
+              ),
+            ));
+      },
+    );
+  }
+
+  AppBar appBar(context) {
+    AppCubit cubit = AppCubit.get(context);
+    return AppBar(
+      elevation: 0,
+      backgroundColor:
+      !cubit.model ? Theme
+          .of(context)
+          .backgroundColor : Colors.white,
+      leading:
+      InkWell(
+        onTap: () {
+          cubit.changMood(!cubit.model);
         },
-        builder: (context, state) {
-          AppCubit cubit = AppCubit.get(context);
-          return Scaffold(
-              // color: !cubit.model ? Colors.white : Colors.black,
-              /// علامة التعجب بحطها عشان اعكس الشرط تاع المودل
-              backgroundColor: !cubit.model
-                  ? Theme.of(context).backgroundColor
-                  : Colors.white,
-              appBar: appBar(context),
-              body: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Column(
-                  children: [
-                    addTaskBar(context),
-                    addDateBar(context),
-                    const SizedBox(
-                      height: 10,
+        child: DayNightSwitcherIcon(
+            isDarkModeEnabled: cubit.model, onStateChanged: cubit.changMood,
+            dayBackgroundColor: cubit.model ? darkHeaderClr : Colors.blueAccent,
+            nightBackgroundColor: cubit.model ? darkHeaderClr : Colors.orange,
+        ),
+      ),
+      // IconButton(
+      //   color: cubit.model ? darkHeaderClr : Colors.white,
+      //   icon: Icon(
+      //     !cubit.model
+      //         ? Icons.wb_sunny_outlined
+      //         : Icons.nightlight_round_outlined,
+      //     size: 24,
+      //   ),
+      //   onPressed: () {
+      //     cubit.changMood(!cubit.model);
+      //   },
+      // ),
+      actions: [
+
+        /// علامة التعجب بحطها عشان اعكس الشرط تاع المودل
+        IconButton(
+          color: cubit.model ? darkHeaderClr : Colors.white,
+          icon: const Icon(
+            Icons.cleaning_services_outlined,
+            size: 24,
+          ),
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext ctx) {
+                  return AlertDialog(
+                    title: const Text(
+                      "Remove All Nots",
+                      style: TextStyle(color: Colors.red),
                     ),
-                    showTasks(context),
-                  ],
-                ),
-              ));
+                    content: const Text(
+                      "Are you sure you want to delete all notes?",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          cubit.deleteAllNote();
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "YES",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "NO",
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+          },
+        ),
+        IconButton(
+            color: cubit.model ? darkHeaderClr : Colors.white,
+            icon: const Icon(Icons.language),
+            onPressed: () {
+              String newLocale =
+              Intl.defaultLocale == 'en' ? 'ar' : 'en';
+              SharedPreferencesController.setLocale(newLocale);
+              MainApp.changeLocale(context, Locale(newLocale));
+              print('${Intl.defaultLocale}');
+            }),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: CircleAvatar(
+            radius: 18,
+            backgroundImage: AssetImage(
+              "assets/images/person.jpg",
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget addTaskBar(context) {
+    AppCubit cubit = AppCubit.get(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+      /// ما بتفرق لو حذفتها
+      crossAxisAlignment: CrossAxisAlignment.end,
+
+      /// ما بتفرق لو حذفتها
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Text(
+            //   /// هاد بجيب نفس الي تحت لكن بجيب اول 3 احرف من اسم الشهر
+            //   ///YMd لو بدي ما يجيبلي اسم الشهر بس يجيبلي ارقام(اليوم والشهر والسنه) بحطله بس
+            //   //DateFormat.yMMMd().format(cubit.selectData),
+            //
+            //   "${DateFormat.yMMMMd().format(cubit.selectedData)}",
+            //   // style: Themes.titleStyle,
+            //   style: TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontWeight.bold,
+            //     color: !cubit.model ? Colors.white : Colors.black,
+            //   ),
+            // ),
+            Text(
+              DateFormat.yMMMMd().format(cubit.selectedData),
+              // style: Themes.supHeadingStyle,
+              style: Themes.titleStyle,
+              // style: TextStyle(
+              //   fontSize: 20,
+              //   fontWeight: FontWeight.bold,
+              //   color: cubit.model ? Colors.white : Colors.grey[700],
+              // ),
+              // overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+            Text(
+              "Today : ${DateFormat.yMMMMd().format(DateTime.now())}",
+              style: Themes.supTitleStyle,
+              overflow: TextOverflow.ellipsis,
+            )
+          ],
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        DefaultButton(
+            onPress: () async {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreateNoteScreen()));
+              // cubit.getNote();
+            },
+            label: "+ ${AppLocalizations.of(context)!.button}",
+        ),
+      ],
+    );
+  }
+
+  Widget addDateBar(context) {
+    AppCubit cubit = AppCubit.get(context);
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      child: DatePicker(
+        DateTime.now(),
+        initialSelectedDate: DateTime.now(),
+        width: 80,
+        height: 80,
+        selectedTextColor: Colors.white,
+        selectionColor: primaryClr,
+        dateTextStyle:
+        Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 20),
+        dayTextStyle:
+        Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 16),
+        monthTextStyle:
+        Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 12),
+        onDateChange: (DateTime newDate) {
+          cubit.changSelectedDate(newDate);
         },
       ),
     );
   }
-}
-
-AppBar appBar(context) {
-  AppCubit cubit = AppCubit.get(context);
-  return AppBar(
-    elevation: 0.0,
-    // color: !cubit.model ? Colors.white : Colors.black,
-    backgroundColor:
-        !cubit.model ? Theme.of(context).backgroundColor : Colors.white,
-    leading: InkWell(
-      onTap: ()
-      {
-        cubit.changMood(!cubit.model);
-      },
-      child: DayNightSwitcherIcon(
-        isDarkModeEnabled: cubit.model,
-        onStateChanged: cubit.changMood
-      ),
-    ),
-    // IconButton(
-    //   color: cubit.model ? darkHeaderClr : Colors.white,
-    //   icon: Icon(
-    //     !cubit.model
-    //         ? Icons.wb_sunny_outlined
-    //         : Icons.nightlight_round_outlined,
-    //     size: 24,
-    //   ),
-    //   onPressed: () {
-    //     cubit.changMood(!cubit.model);
-    //   },
-    // ),
-    actions: [
-      /// علامة التعجب بحطها عشان اعكس الشرط تاع المودل
-      IconButton(
-        color: cubit.model ? darkHeaderClr : Colors.white,
-        icon: const Icon(
-          Icons.cleaning_services_outlined,
-          size: 24,
-        ),
-        onPressed: () {
-          showDialog(
-              barrierDismissible: true,
-              context: context,
-              builder: (BuildContext ctx) {
-                return AlertDialog(
-                  title: const Text(
-                    "Remove All Notes",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  content: const Text(
-                    "Are you sure you want to delete all notes?",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        cubit.deleteAllNote();
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "YES",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "NO",
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                  ],
-                );
-              });
-        },
-      ),
-      IconButton(
-          color: cubit.model ? darkHeaderClr : Colors.white,
-          icon: const Icon(Icons.language),
-          onPressed: () {
-            String newLocale =
-            Intl.defaultLocale == 'en' ? 'ar' : 'en';
-            SharedPreferencesController.setLocale(newLocale);
-            MainApp.changeLocale(context, Locale(newLocale));
-            print('${Intl.defaultLocale}');
-          }),
-      const Padding(
-        padding: EdgeInsets.all(10.0),
-        child: CircleAvatar(
-          radius: 18,
-          backgroundImage: AssetImage(
-            "assets/images/person.jpg",
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
-Widget addTaskBar(context) {
-  AppCubit cubit = AppCubit.get(context);
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween, /// ما بتفرق لو حذفتها
-    crossAxisAlignment: CrossAxisAlignment.end, /// ما بتفرق لو حذفتها
-    children: [
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Text(
-          //   /// هاد بجيب نفس الي تحت لكن بجيب اول 3 احرف من اسم الشهر
-          //   ///YMd لو بدي ما يجيبلي اسم الشهر بس يجيبلي ارقام(اليوم والشهر والسنه) بحطله بس
-          //   //DateFormat.yMMMd().format(cubit.selectData),
-          //
-          //   "${DateFormat.yMMMMd().format(cubit.selectedData)}",
-          //   // style: Themes.titleStyle,
-          //   style: TextStyle(
-          //     fontSize: 18,
-          //     fontWeight: FontWeight.bold,
-          //     color: !cubit.model ? Colors.white : Colors.black,
-          //   ),
-          // ),
-          const SizedBox(
-            height: 5,
-          ),
-          Text(
-            DateFormat.yMMMMd().format(DateTime.now()),
-            // style: Themes.supHeadingStyle,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: !cubit.model ? Colors.white : Colors.grey[700],
-            ),
-            overflow: TextOverflow.ellipsis,
-          )
-        ],
-      ),
-      const SizedBox(
-        width: 10,
-      ),
-      DefaultButton(
-        onPress: () async {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const CreateNoteScreen()));
-        },
-        label: "+ ${AppLocalizations.of(context)!.button}",
-      ),
-    ],
-  );
-}
-
-Widget addDateBar(context) {
-  AppCubit cubit = AppCubit.get(context);
-  return Container(
-    margin: const EdgeInsets.only(top: 10),
-    child: DatePicker(
-      DateTime.now(),
-      initialSelectedDate: DateTime.now(),
-      width: 80,
-      height: 80,
-      selectedTextColor: Colors.white,
-      selectionColor: primaryClr,
-      dateTextStyle:
-          Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 20),
-      dayTextStyle:
-          Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 16),
-      monthTextStyle:
-          Themes.headingStyle.copyWith(color: Colors.grey, fontSize: 12),
-      onDateChange: (DateTime newDate) {
-        cubit.changSelectedDate(newDate);
-      },
-    ),
-  );
-}
 
 // Widget noTasks(BuildContext context) {
 //   AppCubit cubit = AppCubit.get(context);
@@ -304,57 +317,111 @@ Widget addDateBar(context) {
 //   );
 // }
 
-Widget showTasks(context) {
-  AppCubit cubit = AppCubit.get(context);
-  return Expanded(
-    child: (cubit.noteList.isEmpty)
-        ? noTasks(context)
-        : RefreshIndicator(
-      onRefresh: () async {
-        cubit.getNote();
-      },
-      child: ListView.separated(
-        physics: const AlwaysScrollableScrollPhysics(),
-        scrollDirection: SizeConfig.orientation == Orientation.portrait
-            ? Axis.vertical
-            : Axis.horizontal,
-        itemCount: cubit.noteList.length,
-        separatorBuilder: (BuildContext context, intindix) =>
-        const SizedBox(
-          height: 10,
-        ),
-        itemBuilder: (BuildContext context, int indix) {
-          Note note = cubit.noteList[indix];
-          if (cubit.showNote(note)) {
-            var h =
-            note.startTime.toString().split(" ")[0].split(":")[0];
-            var m =
-            note.startTime.toString().split(" ")[0].split(":")[0];
-            cubit.notifyHelper.scheduledNotification(
-                int.parse(h), int.parse(m), note);
-            return AnimationConfiguration.staggeredList(
-              position: indix,
-              duration: const Duration(seconds: 1),
-              child: SlideAnimation(
-                horizontalOffset: SizeConfig.screenWidth * 0.75,
-                child: FadeInAnimation(
-                  child: InkWell(
-                    onTap: () {
-                      showMyBottomSheet(context, note);
-                      print("ok");
-                    },
-                    child: TaskTile(note: note),
+  Widget showNote(context) {
+    AppCubit cubit = AppCubit.get(context);
+    // return Expanded(
+    //     child: noteBuilder(note: note)
+    //   // (
+    //   //     cubit.noteList.isEmpty
+    //   // )
+    //   //     ? noTasks(context)
+    //   //     : RefreshIndicator(
+    //   //   onRefresh: () async {
+    //   //     cubit.getNote();
+    //   //   },
+    //   //   child:
+    //   //   ListView.separated(
+    //   //     physics: const AlwaysScrollableScrollPhysics(),
+    //   //     scrollDirection: SizeConfig.orientation == Orientation.portrait
+    //   //         ? Axis.vertical
+    //   //         : Axis.horizontal,
+    //   //     itemCount: cubit.noteList.length,
+    //   //     separatorBuilder: (BuildContext context, intindix) =>
+    //   //     const SizedBox(
+    //   //       height: 10,
+    //   //     ),
+    //   //     itemBuilder: (BuildContext context, int indix) {
+    //   //       Note note = cubit.noteList[indix];
+    //   //       if (cubit.showNote(note)) {
+    //   //         var h =
+    //   //         note.startTime.toString().split(" ")[0].split(":")[0];
+    //   //         var m =
+    //   //         note.startTime.toString().split(" ")[0].split(":")[0];
+    //   //         cubit.notifyHelper.scheduledNotification(
+    //   //             int.parse(h), int.parse(m), note);
+    //   //         return AnimationConfiguration.staggeredList(
+    //   //           position: indix,
+    //   //           duration: const Duration(seconds: 1),
+    //   //           child: SlideAnimation(
+    //   //             horizontalOffset: SizeConfig.screenWidth * 0.75,
+    //   //             child: FadeInAnimation(
+    //   //               child: InkWell(
+    //   //                 onTap: () {
+    //   //                   showMyBottomSheet(context, note);
+    //   //                   print("ok");
+    //   //                 },
+    //   //                 child: TaskTile(note: note),
+    //   //               ),
+    //   //             ),
+    //   //           ),
+    //   //         );
+    //   //       } else {
+    //   //         return Container();
+    //   //       }
+    //   //     },
+    //   //   ),
+    //   // ),
+    // );
+    return Expanded(
+      child: (cubit.noteList.isEmpty)
+          ? noTasks(context)
+          : RefreshIndicator(
+        onRefresh: () async {
+          cubit.getNote();
+        },
+        child: ListView.separated(
+          physics: const AlwaysScrollableScrollPhysics(),
+          scrollDirection: SizeConfig.orientation == Orientation.portrait
+              ? Axis.vertical
+              : Axis.horizontal,
+          itemCount: cubit.noteList.length,
+          separatorBuilder: (BuildContext context, intindix) =>
+          const SizedBox(
+            height: 10,
+          ),
+          itemBuilder: (BuildContext context, int indix) {
+            Note note = cubit.noteList[indix];
+            if (cubit.showNote(note)) {
+              String h =
+              note.startTime.toString().split(" ")[0].split(":")[0];
+              String m =
+              note.startTime.toString().split(" ")[0].split(":")[0];
+              cubit.notifyHelper.scheduledNotification(
+                  int.parse(h.toString()), int.parse(m.toString()), note);
+              return AnimationConfiguration.staggeredList(
+                position: indix,
+                duration: const Duration(seconds: 1),
+                child: SlideAnimation(
+                  horizontalOffset: SizeConfig.screenWidth * 0.75,
+                  child: FadeInAnimation(
+                    child: InkWell(
+                      onTap: () {
+                        showMyBottomSheet(context, note);
+                        print("ok");
+                      },
+                      child: TaskTile(note: note),
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return Container();
-          }
-        },
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 // import 'package:date_picker_timeline/date_picker_widget.dart';
