@@ -1,10 +1,10 @@
+
 import 'package:date_picker_timeline/date_picker_widget.dart';
 import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:intl/intl.dart';
-import 'package:sizer/sizer.dart';
 import 'package:sqflite_app/bloc/app_states.dart';
 import 'package:sqflite_app/ui/screen/create_note_screen.dart';
 import '../../bloc/cubit.dart';
@@ -20,6 +20,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class NotesScreen extends StatelessWidget {
+
   const NotesScreen({Key? key}) : super(key: key);
 
   // List<Note> _notes = [];
@@ -149,6 +150,7 @@ class NotesScreen extends StatelessWidget {
               String newLocale =
               Intl.defaultLocale == 'en' ? 'ar' : 'en';
               SharedPreferencesController.setLocale(newLocale);
+              Intl.defaultLocale = newLocale;
               MainApp.changeLocale(context, Locale(newLocale));
               print('${Intl.defaultLocale}');
             }),
@@ -397,22 +399,36 @@ class NotesScreen extends StatelessWidget {
               String m =
               note.startTime.toString().split(" ")[0].split(":")[0];
               cubit.notifyHelper.scheduledNotification(
-                  int.parse(h.toString()), int.parse(m.toString()), note);
-              return AnimationConfiguration.staggeredList(
-                position: indix,
-                duration: const Duration(seconds: 1),
-                child: SlideAnimation(
-                  horizontalOffset: SizeConfig.screenWidth * 0.75,
-                  child: FadeInAnimation(
-                    child: InkWell(
-                      onTap: () {
-                        showMyBottomSheet(context, note);
-                        print("ok");
-                      },
-                      child: TaskTile(note: note),
+                   note);
+              return Dismissible(
+                key: ValueKey(cubit.noteList[indix]),
+                child: AnimationConfiguration.staggeredList(
+                  position: indix,
+                  duration: const Duration(seconds: 1),
+                  child: SlideAnimation(
+                    horizontalOffset: SizeConfig.screenWidth * 0.75,
+                    child: FadeInAnimation(
+                      child: InkWell(
+                        onTap: () {
+                          showMyBottomSheet(context, note);
+                          print("ok");
+                        },
+                        child: TaskTile(note: note),
+                      ),
                     ),
                   ),
                 ),
+                onDismissed: (direction){
+                  cubit.deleteNote(note);
+                  Fluttertoast.showToast(
+                      msg: "Task deleted successfully!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      // timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 14);
+                },
               );
             } else {
               return Container();

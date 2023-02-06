@@ -83,11 +83,11 @@ class AppCubit extends Cubit<AppStates> {
     emit(ScRemoveTask());
   }
 
-  void updateNote(Note n) async {
-    await db.update(n);
-    await notifyHelper.cancelNotification(n);
-    if (noteList.contains(n)) {
-      int i = noteList.indexOf(n);
+  void updateNote(Note note) async {
+    await db.update(note);
+    await notifyHelper.cancelNotification(note);
+    if (noteList.contains(note)) {
+      int i = noteList.indexOf(note);
       noteList[i].isCompleted = 1;
     }
     emit(ScUpdateTask());
@@ -99,6 +99,7 @@ class AppCubit extends Cubit<AppStates> {
     noteList = [];
     emit(ScRemoveAllTask());
   }
+
   bool showNote(Note note) {
     return (note.repeat == "Daily" ||
         DateFormat.yMd().format(selectedData) == note.date ||
@@ -115,7 +116,7 @@ class AppCubit extends Cubit<AppStates> {
     var d = DateFormat.yMd().parse(t.date!);
     notifyHelper.displayNotification(
         title: t.title!, body: t.note!, startTime: t.startTime);
-    notifyHelper.scheduledNotification(d.hour, d.minute, t);
+    notifyHelper.scheduledNotification( t);
     emit(SaveAndDisplayNotification());
   }
 }

@@ -12,6 +12,7 @@ const primaryClr = bluishClr;
 const Color darkGreyClr = Color(0xFF121212);
 const Color darkHeaderClr = Color(0xFF424242);
 const Color darkBlue = Color(0xFF192882);
+const Color lightBlue = Color(0xFFbddbff);
 
 
  class Themes {

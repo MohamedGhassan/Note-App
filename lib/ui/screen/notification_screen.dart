@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../../bloc/app_states.dart';
 import '../../bloc/cubit.dart';
 import '../theme.dart';
@@ -8,6 +10,7 @@ class NotificationScreen extends StatelessWidget {
   final String payload;
 
   const NotificationScreen({Key? key, required this.payload}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppStates>(
@@ -25,7 +28,8 @@ class NotificationScreen extends StatelessWidget {
             title: Text(
               payload.split("|")[0],
               textAlign: TextAlign.center,
-              style: Themes.titleStyle.copyWith(color:cubit.model ? Colors.black:Colors.white),
+              style: Themes.titleStyle
+                  .copyWith(color: cubit.model ? Colors.black : Colors.white),
             ),
             leading: IconButton(
               color: cubit.model ? darkHeaderClr : Colors.white,
@@ -40,17 +44,20 @@ class NotificationScreen extends StatelessWidget {
               padding: const EdgeInsets.all(15.0),
               child: Column(
                 children: [
-                  Text("Hello, Let's finish our work",
+                  Text("${AppLocalizations.of(context)!.notificationTitle}",
+                      // "Hello, Let's finish our work",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: Themes.headingStyle),
                   const SizedBox(
                     height: 15,
                   ),
-                  Text("you have a new Task and it is ${payload.split("|")[0]}",
-                      style: Themes.titleStyle,
-                       textAlign: TextAlign.center,
-                    ),
+                  Text(
+                    "${AppLocalizations.of(context)!.notificationSubTitle} ${payload.split("|")[0]}",
+                    // "you have a new Task and it is ${payload.split("|")[0]}",
+                    style: Themes.titleStyle,
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -73,7 +80,9 @@ class NotificationScreen extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              rowData(Icons.text_format, "Title",
+                              rowData(Icons.text_format,
+                                  // "Title",
+                              "${AppLocalizations.of(context)!.noteTitle}",
                                   payload.split("|")[0]),
                               const SizedBox(
                                 height: 15,
@@ -81,7 +90,9 @@ class NotificationScreen extends StatelessWidget {
                               const Divider(
                                 color: Colors.white,
                               ),
-                              rowData(Icons.description, "Description",
+                              rowData(Icons.description,
+                                  "${AppLocalizations.of(context)!.notesDetails}",
+                                  // "Description",
                                   payload.split("|")[1]),
                               const SizedBox(
                                 height: 15,
@@ -89,7 +100,9 @@ class NotificationScreen extends StatelessWidget {
                               const Divider(
                                 color: Colors.white,
                               ),
-                              rowData(Icons.calendar_today_outlined, "Time",
+                              rowData(Icons.calendar_today_outlined,
+                                  // "Time",
+                                  "${AppLocalizations.of(context)!.startTime}",
                                   payload.split("|")[2]),
                               const SizedBox(
                                 height: 15,

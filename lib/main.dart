@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite_app/bloc/cubit.dart';
-import 'package:sqflite_app/bloc/observer.dart';
-import 'package:sqflite_app/database/shared_preferences_controller.dart';
 import 'package:sqflite_app/ui/screen/notes_screen.dart';
 import 'package:sqflite_app/ui/theme.dart';
-
 import 'bloc/app_states.dart';
+import 'bloc/cubit.dart';
+import 'bloc/observer.dart';
+import 'database/shared_preferences_controller.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() async {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferencesController.init();
 
-  BlocOverrides.runZoned((){ runApp(const MainApp(),);
+  BlocOverrides.runZoned(() {runApp(const MainApp(),);
   }, blocObserver: MyBlocObserver());
+
+
 }
 final navigatorKey = GlobalKey<NavigatorState>();
 class MainApp extends StatefulWidget {
@@ -28,40 +29,55 @@ class MainApp extends StatefulWidget {
   }
   const MainApp({Key? key}) : super(key: key);
 
+
   @override
   State<MainApp> createState() => _MainAppState();
 }
 
 class _MainAppState extends State<MainApp> {
-
-  late Locale _locale;
-  void changeLocale(Locale locale){
-    setState(() {
-      _locale = locale;
+  Locale? _locale;
+  void changeLocale(Locale local)
+  {
+    setState(()
+    {
+      _locale = local;
     });
   }
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    Intl.defaultLocale ??= "en";
+    if (Intl.defaultLocale == null) Intl.defaultLocale = 'en';
     _locale = Locale(Intl.defaultLocale!);
-    print("_locale ${Intl.defaultLocale}");
+    print('_locale ${Intl.defaultLocale}');
 
     SharedPreferences.getInstance().then((value)
     {
       String locale = value.getString('locale')!;
       if(locale == null)
       {
-        value.setString('locale', "en");
+        value.setString('locale', 'en');
       }
-      Intl.defaultLocale = locale ?? "en";
-      _locale = Locale(locale ?? "en");
-      print("Locale: $locale");
+      Intl.defaultLocale = locale ?? 'en';
+      _locale = Locale(locale ?? 'en');
+      print('Locale: $locale');
     });
+    print("Local: ${Intl.defaultLocale}");
+    // print("-locale: ${_locale}");
+    // SharedPreferences.getInstance().then((value)
+    // {
+    //   String locale = value.getString('locale')!;
+    //   if(locale == null)
+    //   {
+    //     value.setString('locale', 'en');
+    //   }
+    //   Intl.defaultLocale = locale ?? 'en';
+    //   _locale = Locale(locale ?? 'en');
+    // });
+    // if(Intl.defaultLocale == null) Intl.defaultLocale = 'en';
+    // _locale = Locale(SharedPreferencesController.instance!.locale!);
+    // _locale = Locale(Intl.defaultLocale!);
   }
-  // @override
-
+  @override
   Widget build(BuildContext context) {
     return  BlocProvider(
       create:  (ctx) =>AppCubit()..createDataBase(),
@@ -93,6 +109,7 @@ class _MainAppState extends State<MainApp> {
     );
   }
 }
+
 /*
 class MainApp extends StatefulWidget {
   static void changeLocale(BuildContext context, Locale locale) {

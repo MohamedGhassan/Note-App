@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
-//import 'package:get/get.dart';
-
-//import '../../controllers/task_controller.dart';
-//import '../../services/notification_services.dart';
 import '../../bloc/cubit.dart';
 import '../../models/notes.dart';
 import '../size_config.dart';
@@ -15,7 +10,7 @@ Widget noTasks(BuildContext context) {
   return Stack(
     children: [
       AnimatedPositioned(
-        duration: const Duration(hours: 2),
+        duration: const Duration(seconds: 2),
         child: RefreshIndicator(
           onRefresh: () async {
             cubit.getNote();
@@ -69,7 +64,7 @@ Widget noTasks(BuildContext context) {
 }
 
 //final TaskController controller = Get.put(TaskController());
-showMyBottomSheet(BuildContext context, Note note) {
+showMyBottomSheet(BuildContext context, Note task) {
   AppCubit cubit = AppCubit.get(context);
   //NotifyHelper notifyHelper=NotifyHelper();
 
@@ -94,11 +89,11 @@ showMyBottomSheet(BuildContext context, Note note) {
             const SizedBox(
               height: 20,
             ),
-            note.isCompleted == 1
+            task.isCompleted == 1
                 ? Container()
                 : bottomSheetButton(context, label: "Task completed",
                 ontap: () async {
-                  cubit.updateNote(note);
+                  cubit.updateNote(task);
                   //await notifyHelper.cancelNotification(task);
                   //controller.updateTask(task);
                   //Get.back();
@@ -110,7 +105,7 @@ showMyBottomSheet(BuildContext context, Note note) {
               //controller.deleteTask(task.id!);
               //controller.taskList.remove(task);
               //Get.back();
-              cubit.deleteNote(note);
+              cubit.deleteNote(task);
               Navigator.pop(context);
             }, clr: pinkClr),
             Divider(

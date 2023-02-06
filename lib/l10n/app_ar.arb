@@ -4,8 +4,8 @@
      "button": "اضافة مهام",
      "screenNotes": "المهام",
      "notes": "ليس لديك أي مهام! أضف مهام جديدة لجعل أيامك منتجة",
-     "notesDetails": "تفاصيل المهمة",
      "noteTitle": "عنوان المهمة",
+     "notesDetails": "تفاصيل المهمة",
      "date": "التاريخ",
      "startTime": "بداية الوقت",
      "endTime": "نهاية الوقت",
@@ -16,6 +16,8 @@
      "hintTitle": "عنوان المهمة",
      "hintDetails": "تفاصيل المهمة",
      "createNoteScreen": "انشاء المهام",
+     "notificationTitle": "مرحباً بك، هيا لننهي عملنا",
+     "notificationSubTitle": "لديك مهمة جديدة وهي",
      "editNoteScreen": "تعديل المهام",
      "@helloWorld": {
        "description": "هذه الرسالة الترحيبية للتطبيق"
