@@ -19,6 +19,7 @@ class ScRemoveTask extends AppStates {}
 class ScRemoveAllTask extends AppStates {}
 class ScAddTask extends AppStates {}
 class SaveAndDisplayNotification extends AppStates {}
+class AppGetDBLoadingState extends AppStates {}
 
 class Mood extends AppStates {}
 class ChangSelectedDate extends AppStates {}

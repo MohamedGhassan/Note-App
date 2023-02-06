@@ -16,6 +16,8 @@
      "hintTitle": "task title",
      "hintDetails": "task details",
      "createNoteScreen": "Create Notes",
+     "notificationTitle": "Hello, Let's finish our work",
+     "notificationSubTitle": "you have a new Task and it is",
      "editNoteScreen": "Edit Notes",
      "@helloWorld": {
        "description": "The conventional newborn programmer greeting"

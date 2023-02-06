@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+
 import '../models/notes.dart';
 import '../ui/screen/notification_screen.dart';
 
@@ -33,7 +34,7 @@ class NotifyHelper {
     );
 
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/ic_flutter_notification');
 
     final InitializationSettings initializationSettings =
         InitializationSettings(
@@ -72,9 +73,9 @@ class NotifyHelper {
     );
   }
 
-  cancelNotification(Note n) async {
-    await flutterLocalNotificationsPlugin.cancel(n.id!);
-    print("task ${n.id} canceld");
+  cancelNotification(Note t) async {
+    await flutterLocalNotificationsPlugin.cancel(t.id!);
+    print("task ${t.id} canceld");
   }
 
   cancelAllNotification() async {
@@ -82,57 +83,51 @@ class NotifyHelper {
     print("all task  canceld");
   }
 
-  scheduledNotification(int hour, int minutes, Note note) async {
-    print('payload is ${note.title}|${note.note}|${note.startTime}');
+  scheduledNotification(Note task) async {
+    print('payload is ${task.title}|${task.note}|${task.startTime}');
     await flutterLocalNotificationsPlugin.zonedSchedule(
-      note.id!,
-      note.title,
-      note.note,
+      task.id!,
+      task.title,
+      task.note,
       //tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-      _nextInstanceOfTenAM(
-          hour, minutes, note.remind!, note.repeat!, note.date!),
+      _nextInstanceOfTenAM(task.remind!, task.repeat!, task.date!),
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'your channel id',
-          'your channel name',
-          channelDescription: 'your channel description',
-          icon: '@mipmap/ic_launcher',
-          importance: Importance.max,
-          priority: Priority.max,
-        ),
+            'your channel id', 'your channel name',
+            channelDescription: 'your channel description',
+            icon: '@drawable/ic_flutter_notification'),
       ),
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       matchDateTimeComponents: DateTimeComponents.time,
-      payload: '${note.title}|${note.note}|${note.startTime}|',
+      payload: '${task.title}|${task.note}|${task.startTime}|',
     );
   }
 
-  tz.TZDateTime _nextInstanceOfTenAM(
-      int hour, int minutes, int remind, String repeat, String date) {
+  tz.TZDateTime _nextInstanceOfTenAM(int remind, String repeat, String date) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
     print("now = $now");
     var fd = DateFormat.yMd().parse(date);
     final tz.TZDateTime nfd = tz.TZDateTime.from(fd, tz.local);
     tz.TZDateTime scheduledDate =
-        tz.TZDateTime(tz.local, nfd.year, nfd.month, nfd.day, hour, minutes);
+        tz.TZDateTime(tz.local, nfd.year, nfd.month, nfd.day);
     print("scheduledDate = $scheduledDate");
 
     scheduledDate = afterRemind(remind, scheduledDate);
 
     if (scheduledDate.isBefore(now)) {
       if (repeat == "Daily") {
-        scheduledDate = tz.TZDateTime(
-            tz.local, now.year, now.month, fd.day + 1, hour, minutes);
+        scheduledDate =
+            tz.TZDateTime(tz.local, now.year, now.month, fd.day + 1);
       }
       if (repeat == "weekly") {
-        scheduledDate = tz.TZDateTime(
-            tz.local, now.year, now.month, fd.day + 7, hour, minutes);
+        scheduledDate =
+            tz.TZDateTime(tz.local, now.year, now.month, fd.day + 7);
       }
       if (repeat == "Monthly") {
-        scheduledDate = tz.TZDateTime(
-            tz.local, now.year, (now.month) + 1, fd.day, hour, minutes);
+        scheduledDate =
+            tz.TZDateTime(tz.local, now.year, (now.month) + 1, fd.day);
       }
       scheduledDate = afterRemind(remind, scheduledDate);
     }

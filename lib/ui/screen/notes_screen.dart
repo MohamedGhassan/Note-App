@@ -149,6 +149,7 @@ class NotesScreen extends StatelessWidget {
               String newLocale =
               Intl.defaultLocale == 'en' ? 'ar' : 'en';
               SharedPreferencesController.setLocale(newLocale);
+              Intl.defaultLocale = newLocale;
               MainApp.changeLocale(context, Locale(newLocale));
               print('${Intl.defaultLocale}');
             }),
@@ -397,22 +398,36 @@ class NotesScreen extends StatelessWidget {
               String m =
               note.startTime.toString().split(" ")[0].split(":")[0];
               cubit.notifyHelper.scheduledNotification(
-                  int.parse(h.toString()), int.parse(m.toString()), note);
-              return AnimationConfiguration.staggeredList(
-                position: indix,
-                duration: const Duration(seconds: 1),
-                child: SlideAnimation(
-                  horizontalOffset: SizeConfig.screenWidth * 0.75,
-                  child: FadeInAnimation(
-                    child: InkWell(
-                      onTap: () {
-                        showMyBottomSheet(context, note);
-                        print("ok");
-                      },
-                      child: TaskTile(note: note),
+                   note);
+              return Dismissible(
+                key: ValueKey(cubit.noteList[indix]),
+                child: AnimationConfiguration.staggeredList(
+                  position: indix,
+                  duration: const Duration(seconds: 1),
+                  child: SlideAnimation(
+                    horizontalOffset: SizeConfig.screenWidth * 0.75,
+                    child: FadeInAnimation(
+                      child: InkWell(
+                        onTap: () {
+                          showMyBottomSheet(context, note);
+                          print("ok");
+                        },
+                        child: TaskTile(note: note),
+                      ),
                     ),
                   ),
                 ),
+                onDismissed: (direction){
+                  cubit.deleteNote(note);
+                  Fluttertoast.showToast(
+                      msg: "Task deleted successfully!",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      // timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 14);
+                },
               );
             } else {
               return Container();
