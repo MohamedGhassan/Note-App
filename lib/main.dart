@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_app/ui/screen/notes_screen.dart';
+import 'package:sqflite_app/ui/screen/splach_screen.dart';
 import 'package:sqflite_app/ui/theme.dart';
 import 'bloc/app_states.dart';
 import 'bloc/cubit.dart';
@@ -102,7 +103,7 @@ class _MainAppState extends State<MainApp> {
               const Locale('ar', ''), // Arabic, no country code
             ],
             locale: _locale,
-            home: const NotesScreen(),
+            home: SplachScreen(),
           );
         },
       ),
